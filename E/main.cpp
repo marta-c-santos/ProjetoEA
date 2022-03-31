@@ -3,34 +3,43 @@
 using namespace std;
 
 int pizza(int n, int somaT, vector <int> tempos) {
-4
-    int somatorio1 = somaT/2;
-    int final = 1;
-    vector <vector <bool>> DP(n, vector<bool>(somatorio1, false));
 
-    for (int i = 0; i < n; i++) {
+    int somatorio1 = somaT/2 + 1;
+    int final = 0;
+    vector <vector <bool>> DP(n + 1, vector<bool>(somatorio1, false));
+
+    for (int i = 0; i <= n; i++) {
         DP[i][0] = true;
     }
 
-    for (int j = 0; j < somatorio1; j++) {
+    for (int j = 1; j <= somatorio1; j++) {
         DP[0][j] = false;
     }
 
-    for (int i = 1; i < n; i++) {
-        for (int j = 1; j < somatorio1; j++) {
-            if (tempos[i] > j) {
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= somatorio1; j++) {
+            if (tempos[i - 1] > j) {
                 DP[i][j] = DP[i - 1][j];
             } else {
-                DP[i][j] = DP[i - 1][j] or DP[i - 1][j - tempos[i]];
+                //DP[i][j] = DP[i - 1][j] | DP[i - 1][j - tempos[i - 1]];
+
+                if (DP[i - 1][j]) {
+                    DP[i][j] = DP[i - 1][j];
+                } else {
+                    DP[i][j] = DP[i - 1][j - tempos[i - 1]];
+                }
             }
+
         }
     }
-    for (int j = somatorio1; j >= 0; j--) {
-        if (DP[n-1][j] == true) {
+    for (int j = somatorio1 - 1; j >= 0; j--) {
+        if (DP[n][j] == true) {
             final = j;
+            break;
         }
     }
-    return final;
+
+    return abs(somaT - 2*final);
 }
 
 int main() {
@@ -39,7 +48,6 @@ int main() {
 
     while (cin >> n) {
         int somaT = 0;
-        tempos.push_back(0);
         if (n >= 1 and n <= 100) {
             for (int i = 0; i < n; i++) {
                 cin >> tempo;
@@ -47,8 +55,8 @@ int main() {
                 tempos.push_back(tempo);
             }
             cout << pizza(n, somaT, tempos) << "\n";
-            tempos.clear();
         }
+        tempos.clear();
     }
 
     return 0;
